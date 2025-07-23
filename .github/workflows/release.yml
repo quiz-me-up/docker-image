@@ -31,13 +31,39 @@ jobs:
           release_type: ${{ github.event.inputs.release_type }}
           fallback_version: '0.0.0'
 
-      - name: Publish docker image to docker hub
-        uses: quiz-me-up/reusable-workflow/.github/actions/publish-docker-image@master
+      - name: Set up Docker Hub credentials
+        uses: quiz-me-up/reusable-workflow/.github/actions/setup-docker-hub@master
         with:
-          image_name: maven
-          image_tag: ${{ steps.next_version.outputs.version }}
           dockerhub_username: ${{ secrets.QUIZ_ME_UP_DOCKER_USERNAME }}
-          dockerhub_token: ${{ secrets.QUIZ_ME_UP_DOCKER_TOKEN }}
+          dockerhub_password: ${{ secrets.QUIZ_ME_UP_DOCKER_TOKEN }}
+
+      - name: Create Maven settings.xml
+        run: |
+          if [ -n "${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}" ]; then
+            echo '${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}' > ./maven/settings.xml
+          fi
+
+      - name: Build Docker images
+        run: |
+          docker build -t quizmeup/maven:${{ steps.next_version.outputs.version }} -t quizmeup/maven:latest ./maven
+          docker build -t quizmeup/mongo:${{ steps.next_version.outputs.version }} -t quizmeup/mongo:latest ./mongo
+          docker build -t quizmeup/mongo-express:${{ steps.next_version.outputs.version }} -t quizmeup/mongo-express:latest ./mongo/mongo-express
+          docker build -t quizmeup/rabbitmq:${{ steps.next_version.outputs.version }} -t quizmeup/rabbitmq:latest ./rabbitmq
+
+      # Push des images vers Docker Hub
+      - name: Push Docker images to Docker Hub
+        run: |
+          # Push avec tag de version
+          docker push quizmeup/maven:${{ steps.next_version.outputs.version }}
+          docker push quizmeup/mongo:${{ steps.next_version.outputs.version }}
+          docker push quizmeup/mongo-express:${{ steps.next_version.outputs.version }}
+          docker push quizmeup/rabbitmq:${{ steps.next_version.outputs.version }}
+          
+          # Push avec tag latest
+          docker push quizmeup/maven:latest
+          docker push quizmeup/mongo:latest
+          docker push quizmeup/mongo-express:latest
+          docker push quizmeup/rabbitmq:latest
 
       - name: Setup git bot user
         uses: quiz-me-up/reusable-workflow/.github/actions/setup-git-bot-user@master
