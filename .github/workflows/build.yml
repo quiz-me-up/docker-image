@@ -15,8 +15,12 @@ jobs:
       - name: Checkout project directory
         uses: actions/checkout@v4
 
+      - name: Create Maven settings.xml
+        run: |
+          echo '${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}' > ./maven/settings.xml
+
       - name: Build maven image
-        run: docker build --build-arg SETTINGS_XML="${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}" -t quizmeup/maven ./maven
+        run: docker build -t quizmeup/maven ./maven
 
       - name: Build mongo image
         run: docker build -t quizmeup/mongo ./mongo
