@@ -1,0 +1,28 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!gh-pages'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.QUIZ_ME_UP_GITHUB_TOKEN }}
+    steps:
+      - name: Checkout project directory
+        uses: actions/checkout@v4
+
+      - name: Build maven image
+        run: docker build --build-arg SETTINGS_XML="${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}" -t quizmeup/maven ./maven
+
+      - name: Build mongo image
+        run: docker build -t quizmeup/mongo ./mongo
+
+      - name: Build mongo-express image
+        run: docker build -t quizmeup/mongo-express ./mongo/mongo-express
+
+      - name: Build rabbitmq image
+        run: docker build -t quizmeup/rabbitmq ./rabbitmq

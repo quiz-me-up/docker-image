@@ -1,0 +1,18 @@
+services:
+  rabbitmq-broker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${QUIZ_ME_UP_RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${QUIZ_ME_UP_RABBITMQ_PASSWORD}
+    volumes:
+      - "rabbitmq_data:/var/lib/rabbitmq"
+
+volumes:
+  rabbitmq_data:
+    driver: local

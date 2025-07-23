@@ -1,0 +1,32 @@
+services:
+  mongo-database:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${QUIZ_ME_UP_MONGO_DATABASE_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${QUIZ_ME_UP_MONGO_DATABASE_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongo_data:/data/db"
+
+  mongo-express:
+    build:
+      context: ./mongo-express
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${QUIZ_ME_UP_MONGO_DATABASE_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${QUIZ_ME_UP_MONGO_DATABASE_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongo-database
+      ME_CONFIG_MONGODB_PORT: "27017"
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo-database
+
+volumes:
+  mongo_data:
+    driver: local
