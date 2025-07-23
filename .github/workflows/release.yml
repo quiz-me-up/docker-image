@@ -39,12 +39,8 @@ jobs:
         env:
           QUIZ_ME_UP_GITHUB_TOKEN: ${{ secrets.QUIZ_ME_UP_GITHUB_TOKEN }}
         run: |
-          if [ -n "${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}" ]; then
-            echo '${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}' | envsubst '${QUIZ_ME_UP_GITHUB_TOKEN}' > ./maven/settings.xml
-            echo "✅ Maven settings.xml created with GITHUB_TOKEN substitution"
-          else
-            echo "⚠️ No Maven settings.xml variable found"
-          fi
+          echo '${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}' | envsubst '${QUIZ_ME_UP_GITHUB_TOKEN}' > ./maven/settings.xml
+          echo "✅ Maven settings.xml created with GITHUB_TOKEN substitution"
 
       - name: Build Docker images
         run: |
