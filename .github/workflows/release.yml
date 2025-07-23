@@ -39,16 +39,14 @@ jobs:
 
       - name: Create Maven settings.xml
         run: |
-          if [ -n "${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}" ]; then
-            echo '${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}' > ./maven/settings.xml
-          fi
+          echo '${{ vars.QUIZ_ME_UP_MAVEN_SETTINGS_XML }}' > ./maven/settings.xml
 
       - name: Build Docker images
         run: |
           docker build -t quizmeup/maven:${{ steps.next_version.outputs.version }} -t quizmeup/maven:latest ./maven
           docker build -t quizmeup/mongo:${{ steps.next_version.outputs.version }} -t quizmeup/mongo:latest ./mongo
-          docker build -t quizmeup/mongo-express:${{ steps.next_version.outputs.version }} -t quizmeup/mongo-express:latest ./mongo/mongo-express
           docker build -t quizmeup/rabbitmq:${{ steps.next_version.outputs.version }} -t quizmeup/rabbitmq:latest ./rabbitmq
+          docker build -t quizmeup/mongo-express:${{ steps.next_version.outputs.version }} -t quizmeup/mongo-express:latest ./mongo/mongo-express
 
       # Push des images vers Docker Hub
       - name: Push Docker images to Docker Hub
@@ -56,14 +54,14 @@ jobs:
           # Push avec tag de version
           docker push quizmeup/maven:${{ steps.next_version.outputs.version }}
           docker push quizmeup/mongo:${{ steps.next_version.outputs.version }}
-          docker push quizmeup/mongo-express:${{ steps.next_version.outputs.version }}
           docker push quizmeup/rabbitmq:${{ steps.next_version.outputs.version }}
+          docker push quizmeup/mongo-express:${{ steps.next_version.outputs.version }}
           
           # Push avec tag latest
           docker push quizmeup/maven:latest
           docker push quizmeup/mongo:latest
-          docker push quizmeup/mongo-express:latest
           docker push quizmeup/rabbitmq:latest
+          docker push quizmeup/mongo-express:latest
 
       - name: Setup git bot user
         uses: quiz-me-up/reusable-workflow/.github/actions/setup-git-bot-user@master
