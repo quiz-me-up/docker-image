@@ -1,8 +1,6 @@
 FROM maven:3.9.10-eclipse-temurin-21
 MAINTAINER QuizMeUp <quizmeup.contact@gmail.com>
 
-ARG SETTINGS_XML_PATH
-
 # Créer le répertoire .m2 s'il n'existe pas
 RUN mkdir -p /root/.m2
 
