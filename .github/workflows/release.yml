@@ -49,7 +49,6 @@ jobs:
           docker build -t quizmeup/rabbitmq:${{ steps.next_version.outputs.version }} -t quizmeup/rabbitmq:latest ./rabbitmq
           docker build -t quizmeup/mongo-express:${{ steps.next_version.outputs.version }} -t quizmeup/mongo-express:latest ./mongo/mongo-express
 
-      # Push des images vers Docker Hub
       - name: Push Docker images to Docker Hub
         run: |
           # Push avec tag de version
@@ -63,6 +62,18 @@ jobs:
           docker push quizmeup/mongo:latest
           docker push quizmeup/rabbitmq:latest
           docker push quizmeup/mongo-express:latest
+
+      - name: Cleanup sensitive files and check for leaks
+        run: |
+          rm -f ./maven/settings.xml
+          echo "✅ Attempted to delete maven/settings.xml"
+          
+          # Vérification : Si le fichier existe encore, arrêter le workflow
+          if [ -f ./maven/settings.xml ]; then
+            echo "❌ Potential token leak detected! settings.xml still exists. Aborting workflow."
+            exit 1  # Cela fait échouer le job et arrête le workflow
+          fi
+          echo "✅ No leak detected: settings.xml deleted successfully"
 
       - name: Setup git bot user
         uses: quiz-me-up/reusable-workflow/.github/actions/setup-git-bot-user@master
